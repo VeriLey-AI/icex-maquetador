@@ -1,0 +1,9 @@
+# Datos de portada, contraportada, cabeceras y pies de la plantilla ICEX.
+sector = "aceite de oliva"
+pais   = "Alemania"
+ciudad = "Berlín"
+autor  = "Nombre Apellido"
+fecha  = 2026-11-17        # rellena [día] de [mes] de [año]
+enlace = "https://www.icex.es"   # sustituye [INSERTAR ENLACE]; "" para dejarlo vacío
+web_pais = "alemania"      # http://alemania.oficinascomerciales.es
+# nipo = "224240080"       # NIPO oficial del estudio (si procede)

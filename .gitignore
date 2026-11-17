@@ -1,0 +1,10 @@
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+~$*
+*_ICEX.docx
+salida/
+# La plantilla oficial es propiedad de ICEX: cada persona la descarga y la coloca aquí.
+plantilla/*.docx
+plantilla/*.dotx

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "icex-maquetador"
+version = "0.1.0"
+description = "Traslada un .docx redactado en Word/Google Docs a la plantilla oficial de estudios de mercado de ICEX"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = ["python-docx>=1.1"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+icex-maquetador = "icex_maquetador.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
