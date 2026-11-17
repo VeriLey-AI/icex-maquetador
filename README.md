@@ -18,7 +18,7 @@ plantilla/*.docx┘
 Requiere Python 3.11 o superior.
 
 ```bash
-git clone https://github.com/<usuario>/icex-maquetador.git
+git clone https://github.com/VeriLey-AI/icex-maquetador.git
 cd icex-maquetador
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
