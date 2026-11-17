@@ -28,7 +28,9 @@ RE_TITULO_OBJ = re.compile(r"^\s*(tabla|gr[aá]fico|figura|foto|mapa|cuadro)\s*(
 RE_SUBTITULO = re.compile(r"^\s*(subt[ií]tulo|unidades?)\s*[:]\s*", re.I)
 RE_PIE = re.compile(r"^\s*(fuentes?|elaboraci[oó]n propia)\s*[:.]", re.I)
 RE_DESTACADO = re.compile(r"^\s*destacado\s*:\s*", re.I)
-RE_NUM_MANUAL = re.compile(r"^\s*(?:\d{1,2}(?:\.\d{1,2})+\.?|\d{1,2}\.)\s+(?=\S)")
+RE_NUM_MANUAL = re.compile(r"^\s*(?:\d{1,2}(?:\.\d{1,2})+\.?|\d{1,2}\.)\s*(?=[A-Za-zÁÉÍÓÚÑáéíóúñ¿¡(])")
+# Título "escrito a mano" en un párrafo normal: "1. RESUMEN", "2.1. Objetivos", "3.OFERTA"
+RE_TITULO_NUM = re.compile(r"^\s*(\d{1,2}(?:\s*\.\s*\d{1,2}){0,2})\s*\.\s*(?=[A-Za-zÁÉÍÓÚÑáéíóúñ¿¡(])(.{2,85})$")
 
 NOMBRES_TITULO = {"title", "título", "titulo", "subtitle", "subtítulo", "subtitulo"}
 NOMBRES_CAPTION = {"caption", "leyenda", "epígrafe", "epigrafe"}
@@ -41,7 +43,8 @@ class Documento:
 
 
 class Lector:
-    def __init__(self, ruta: str):
+    def __init__(self, ruta: str, titulos_numerados: bool = False):
+        self.titulos_numerados = titulos_numerados
         self.doc = docx.Document(ruta)
         self.out = Documento()
         self._num_cache: dict[tuple[str, int], bool] = {}
@@ -316,6 +319,25 @@ class Lector:
             self.out.bloques.append({"k": "h", "lvl": nivel, "runs": runs})
             self.out.bloques.extend(imgs)
             return
+
+        # --- títulos escritos a mano ("1. RESUMEN") en párrafos normales (opcional)
+        if self.titulos_numerados and self._numpr(p) is None:
+            m = RE_TITULO_NUM.match(texto)
+            if m and not texto.rstrip().endswith((".", ":", ";", ",")):
+                nivel = len(re.findall(r"\d+", m.group(1)))
+                if nivel == 1 and m.group(1).strip() == "":
+                    nivel = 1
+                runs = _quitar_prefijo(runs, RE_NUM_MANUAL)
+                if texto.upper() == texto:  # TODO EN MAYÚSCULAS → capitalización normal
+                    runs = [dict(r, text=r["text"].lower()) if "text" in r else r for r in runs]
+                    primero = next((r for r in runs if "text" in r and r["text"].strip()), None)
+                    if primero is not None:
+                        t = primero["text"]
+                        i = len(t) - len(t.lstrip())
+                        primero["text"] = t[:i] + t[i:i + 1].upper() + t[i + 1:]
+                self.out.bloques.append({"k": "h", "lvl": nivel, "runs": runs})
+                self.out.bloques.extend(imgs)
+                return
 
         # --- listas
         np = self._numpr(p)

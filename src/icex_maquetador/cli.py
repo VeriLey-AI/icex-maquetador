@@ -20,6 +20,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("-c", "--portada", help="fichero TOML con los datos de portada (ver ejemplos/portada.toml)")
     ap.add_argument("-o", "--salida", help="documento de salida (por defecto <entrada>_ICEX.docx)")
     ap.add_argument("--max-img-cm", type=float, default=15.5, help="ancho máximo de imágenes en cm")
+    ap.add_argument("--titulos-numerados", action="store_true",
+                    help="detecta como títulos los párrafos normales que empiezan por '1.', '2.1.'… "
+                         "(para borradores sin estilos de título)")
     ap.add_argument("--actualizar-indice", action="store_true",
                     help="(macOS + Word) abre el resultado en Word, actualiza el índice y guarda")
     ap.add_argument("--version", action="version", version=__version__)
@@ -34,7 +37,7 @@ def main(argv: list[str] | None = None) -> int:
                  f"(ver plantilla/LEEME.md) o indica otra ruta con --plantilla.")
     salida = Path(a.salida) if a.salida else entrada.with_name(entrada.stem + "_ICEX.docx")
 
-    lector = Lector(str(entrada))
+    lector = Lector(str(entrada), titulos_numerados=a.titulos_numerados)
     doc = lector.leer()
     cfg = cargar_config(a.portada)
     esc = Escritor(str(plantilla), max_img_cm=a.max_img_cm)
